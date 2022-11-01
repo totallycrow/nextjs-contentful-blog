@@ -1,7 +1,10 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import fetchContentfulPosts from "../services/contentfulPosts";
+import {
+  fetchContentfulPosts,
+  fetchSingleContentfulEntry,
+} from "../services/contentfulPosts";
 import { PostCard } from "../components/PostCard";
 import { Navbar } from "../components/Layout/Navbar";
 

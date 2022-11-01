@@ -12,4 +12,8 @@ export async function fetchContentfulPosts() {
   console.log(`Error getting Entries.`);
 }
 
-export default fetchContentfulPosts;
+export async function fetchSingleContentfulEntry(entryId: string) {
+  const entry = await client.getEntry(entryId);
+  if (entry.fields) return entry.fields;
+  console.log(`Error getting Entry.`);
+}
