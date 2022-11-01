@@ -1,16 +1,14 @@
 import { useRouter } from "next/router";
 import {
   fetchContentfulPosts,
-  fetchSingleContentfulEntry,
+  fetchContentfulPostBySlug,
 } from "../../services/contentfulPosts";
+import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 
 const Post = ({ posts }: any) => {
-  const router = useRouter();
-  const { slug } = router.query;
-  console.log(posts);
-  console.log(slug);
+  if (!posts) return <div>Loading</div>;
 
-  const targetPost = posts.find((post: any) => post.slug === slug);
+  const targetPost = posts.fields;
   console.log(targetPost);
   console.log("Test");
   console.log(targetPost.content.content[0].content[0].value);
@@ -25,16 +23,36 @@ const Post = ({ posts }: any) => {
 
 export default Post;
 
-export async function getStaticProps() {
-  const res = await fetchContentfulPosts();
-  const posts = await res.map((post: any) => {
-    return post.fields;
+const space = process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID;
+const accessToken = process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN;
+
+const client = require("contentful").createClient({
+  space: space,
+  accessToken: accessToken,
+});
+
+export async function getStaticProps({ params }: any) {
+  const { items } = await client.getEntries({
+    content_type: "blog-post",
+    "fields.slug": params.slug,
   });
+  // const posts = await res.map((post: any) => {
+  //   return post.fields;
+  // });
+  if (!items.length)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  const posts = items[0];
 
   return {
     props: {
       posts,
     },
+    revalidate: 60,
   };
 }
 
@@ -44,13 +62,9 @@ export async function getStaticPaths() {
     return post.fields;
   });
 
-  // Get the paths we want to prerender based on posts
-  // In production environments, prerender all pages
-  // (slower builds, but faster initial page load)
   const paths = posts.map((post: any) => ({
     params: { slug: post.slug },
   }));
 
-  // { fallback: false } means other routes should 404
-  return { paths, fallback: false };
+  return { paths, fallback: true };
 }

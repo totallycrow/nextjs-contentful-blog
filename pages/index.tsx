@@ -3,7 +3,7 @@ import Head from "next/head";
 import Image from "next/image";
 import {
   fetchContentfulPosts,
-  fetchSingleContentfulEntry,
+  fetchContentfulPostBySlug,
 } from "../services/contentfulPosts";
 import { PostCard } from "../components/PostCard";
 import { Navbar } from "../components/Layout/Navbar";
@@ -18,12 +18,15 @@ const Home: NextPage = ({ posts }: any) => {
           <div className="m-auto w-1/2">
             <h2>New Stories</h2>
             <div className="grid grid-cols-3 gap-4">
-              <PostCard />
-              <PostCard />
-              <PostCard />
-              <PostCard />
-              <PostCard />
-              <PostCard />
+              {posts.map((post: any) => {
+                return (
+                  <PostCard
+                    key={post.slug}
+                    slug={post.slug}
+                    image={"https:" + post.mainImage.fields.file.url}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
@@ -44,5 +47,6 @@ export async function getStaticProps() {
     props: {
       posts,
     },
+    revalidate: 60,
   };
 }

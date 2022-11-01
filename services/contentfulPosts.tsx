@@ -7,13 +7,19 @@ const client = require("contentful").createClient({
 });
 
 export async function fetchContentfulPosts() {
-  const entries = await client.getEntries();
+  const entries = await client.getEntries({
+    content_type: "blog-post",
+  });
   if (entries.items) return entries.items;
   console.log(`Error getting Entries.`);
 }
 
-export async function fetchSingleContentfulEntry(entryId: string) {
-  const entry = await client.getEntry(entryId);
-  if (entry.fields) return entry.fields;
+export async function fetchContentfulPostBySlug(slug: string) {
+  const entry = await client.getEntries({
+    content_type: "blog-post",
+    "fields.slug": slug,
+  });
+
+  if (entry.fields) return entry.items[0];
   console.log(`Error getting Entry.`);
 }
