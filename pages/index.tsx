@@ -1,12 +1,9 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import {
-  fetchContentfulPosts,
-  fetchContentfulPostBySlug,
-} from "../services/contentfulPosts";
+import { fetchContentfulPosts } from "../services/contentfulPosts";
 import { PostCard } from "../components/PostCard";
-import { Navbar } from "../components/Layout/Navbar";
+import { IPost, IResponseItem } from "../types/types";
 
 const Home: NextPage = ({ posts }: any) => {
   console.log(posts);
@@ -18,7 +15,7 @@ const Home: NextPage = ({ posts }: any) => {
           <div className="m-auto w-1/2">
             <h2>New Stories</h2>
             <div className="grid grid-cols-3 gap-4">
-              {posts.map((post: any) => {
+              {posts.map((post: IPost) => {
                 return (
                   <PostCard
                     key={post.slug}
@@ -39,7 +36,7 @@ export default Home;
 
 export async function getStaticProps() {
   const res = await fetchContentfulPosts();
-  const posts = await res.map((post: any) => {
+  const posts = await res.map((post: IResponseItem) => {
     return post.fields;
   });
 

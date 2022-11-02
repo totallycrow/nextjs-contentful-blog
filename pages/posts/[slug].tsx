@@ -1,17 +1,14 @@
 import { useRouter } from "next/router";
 import {
-  fetchContentfulPosts,
   fetchContentfulPostBySlug,
+  fetchContentfulPosts,
 } from "../../services/contentfulPosts";
-import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
+import { IPost, IResponseItem } from "../../types/types";
 
 const Post = ({ posts }: any) => {
   if (!posts) return <div>Loading</div>;
 
   const targetPost = posts.fields;
-  console.log(targetPost);
-  console.log("Test");
-  console.log(targetPost.content.content[0].content[0].value);
 
   return (
     <div>
@@ -23,22 +20,9 @@ const Post = ({ posts }: any) => {
 
 export default Post;
 
-const space = process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID;
-const accessToken = process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN;
-
-const client = require("contentful").createClient({
-  space: space,
-  accessToken: accessToken,
-});
-
 export async function getStaticProps({ params }: any) {
-  const { items } = await client.getEntries({
-    content_type: "blog-post",
-    "fields.slug": params.slug,
-  });
-  // const posts = await res.map((post: any) => {
-  //   return post.fields;
-  // });
+  const { items } = await fetchContentfulPostBySlug(params.slug);
+
   if (!items.length)
     return {
       redirect: {
@@ -58,11 +42,11 @@ export async function getStaticProps({ params }: any) {
 
 export async function getStaticPaths() {
   const res = await fetchContentfulPosts();
-  const posts = await res.map((post: any) => {
+  const posts = await res.map((post: IResponseItem) => {
     return post.fields;
   });
 
-  const paths = posts.map((post: any) => ({
+  const paths = posts.map((post: IPost) => ({
     params: { slug: post.slug },
   }));
 

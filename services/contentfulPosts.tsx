@@ -14,12 +14,28 @@ export async function fetchContentfulPosts() {
   console.log(`Error getting Entries.`);
 }
 
+export async function fetchContentfulCategories() {
+  const entries = await client.getEntries({
+    content_type: "category",
+  });
+  if (entries.items) return entries.items;
+
+  console.log(`Error getting Entries.`);
+}
+
 export async function fetchContentfulPostBySlug(slug: string) {
   const entry = await client.getEntries({
     content_type: "blog-post",
     "fields.slug": slug,
   });
 
-  if (entry.fields) return entry.items[0];
+  if (entry) return entry;
   console.log(`Error getting Entry.`);
+}
+
+export async function fetchContentfulCategoryBySlug(slug: string) {
+  return await client.getEntries({
+    content_type: "category",
+    "fields.slug": slug,
+  });
 }
