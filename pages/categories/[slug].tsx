@@ -4,7 +4,7 @@ import {
   fetchContentfulCategoryBySlug,
   fetchContentfulPosts,
 } from "../../services/contentfulPosts";
-import { IPost, IResponseItem } from "../../types/types";
+import { IFullCategoryData, IPost, IResponseItem } from "../../types/types";
 
 const Category = (props: any) => {
   console.log(props);
@@ -17,9 +17,11 @@ const Category = (props: any) => {
 export default Category;
 
 export async function getStaticProps({ params }: any) {
-  const category = await fetchContentfulCategoryBySlug(params.slug);
+  const category = await fetchContentfulCategoryBySlug<IFullCategoryData>(
+    params.slug
+  );
 
-  if (category.items.length === 0 || !category) {
+  if (!category) {
     return {
       redirect: {
         destination: "/",
@@ -28,7 +30,7 @@ export async function getStaticProps({ params }: any) {
     };
   }
 
-  const targetCategory = category.items[0].fields.slug;
+  const targetCategory = category.fields.slug;
 
   return {
     props: {
@@ -39,12 +41,16 @@ export async function getStaticProps({ params }: any) {
 }
 
 export async function getStaticPaths() {
-  const res = await fetchContentfulCategories();
-  const categories = await res.map((post: IResponseItem) => {
+  console.log("STATIC PATHS - CATEGORIES");
+  const res = await fetchContentfulCategories<Array<IFullCategoryData>>();
+  if (!res) return;
+  console.log(res);
+
+  const categories = await res.map((post) => {
     return post.fields;
   });
 
-  const paths = categories.map((post: IPost) => ({
+  const paths = categories.map((post) => ({
     params: { slug: post.slug },
   }));
 

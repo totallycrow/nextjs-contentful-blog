@@ -1,11 +1,9 @@
 import { GetStaticProps } from "next";
-import { useRouter } from "next/router";
-import { ParsedUrlQuery } from "querystring";
 import {
   fetchContentfulPostBySlug,
   fetchContentfulPosts,
 } from "../../services/contentfulPosts";
-import { IPost, IPosts, IResponseItem } from "../../types/types";
+import { IFullPostData, IPost, IResponseItem, Params } from "../../types/types";
 
 // fetch
 
@@ -34,69 +32,29 @@ const Post: React.FC<PostPage> = (props) => {
   console.log("PROPS MAIN POSTS");
   console.log(props);
 
-  const content = props.sections.content.content;
-  console.log(content);
+  const content = props.sections.content.content[0].content[0].value;
   const title = props.sections.title;
 
-  // dispatch(loadPosts, shared);
-
-  // if (!posts) return <div>Loading</div>;
-  // const targetPost = posts.fields;
+  if (!content || !title) return <div>Loading</div>;
 
   return (
     <div>
       <h2>{title}</h2>
-      <p>{content[0].content[0].value}</p>
+      <p>{content}</p>
     </div>
   );
 };
 
-interface IParam {
-  slug: string;
-}
-
-interface Params extends ParsedUrlQuery {
-  slug: string;
-}
-
-interface IFullPostData {
-  metadata: { tags: [] };
-  sys: {
-    space: [Object];
-    id: string;
-    type: string;
-    createdAt: string;
-    updatedAt: string;
-    environment: [Object];
-    revision: number;
-    contentType: [Object];
-    locale: string;
-  };
-  fields: {
-    mainImage: [Object];
-    title: string;
-    content: [Object];
-    slug: string;
-    postCategory: string;
-  };
-}
-
 export default Post;
 
+// ************************************************************************************************************
 export const getStaticProps: GetStaticProps<PostPage, Params> = async (
   context
 ) => {
   const params = context.params!;
-
-  console.log("GET STATIC PROPS - POSTS");
-  console.log(params);
   const { slug } = params;
 
-  const entry = (await fetchContentfulPostBySlug(
-    params?.slug
-  )) as Array<IFullPostData>;
-  console.log(entry);
-  // const preprocessedHeading = preprocessHeading(items);
+  const entry = (await fetchContentfulPostBySlug(slug)) as Array<IFullPostData>;
 
   if (!entry.length)
     return {
@@ -106,10 +64,6 @@ export const getStaticProps: GetStaticProps<PostPage, Params> = async (
       },
     };
   const targetPost = entry[0];
-
-  // const props: PostPage = {
-  //   heading: (await getHeading()) || mock,
-  // };
 
   return {
     props: {
@@ -125,8 +79,8 @@ export const getStaticProps: GetStaticProps<PostPage, Params> = async (
   };
 };
 
+// ************************************************************************************************************
 export async function getStaticPaths() {
-  console.log("STATIC PATHS - POSTS");
   const res = await fetchContentfulPosts<Array<IResponseItem>>();
   if (res instanceof Error) return;
 

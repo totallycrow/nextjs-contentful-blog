@@ -16,13 +16,11 @@ export async function fetchContentfulPosts<T>(): Promise<T> {
   return entries.items as T;
 }
 
-export async function fetchContentfulCategories() {
+export async function fetchContentfulCategories<T>(): Promise<T> {
   const entries = await client.getEntries({
     content_type: "category",
   });
-  if (entries.items) return entries.items;
-
-  console.log(`Error getting Entries.`);
+  return entries.items as T;
 }
 
 export async function fetchContentfulPostBySlug<T>(slug: string): Promise<T> {
@@ -34,9 +32,13 @@ export async function fetchContentfulPostBySlug<T>(slug: string): Promise<T> {
   return entry.items as T;
 }
 
-export async function fetchContentfulCategoryBySlug(slug: string) {
-  return await client.getEntries({
-    content_type: "category",
-    "fields.slug": slug,
-  });
+export async function fetchContentfulCategoryBySlug<IFullCategoryData>(
+  slug: string
+): Promise<IFullCategoryData> {
+  return (
+    await client.getEntries({
+      content_type: "category",
+      "fields.slug": slug,
+    })
+  ).items[0] as IFullCategoryData;
 }

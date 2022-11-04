@@ -5,8 +5,12 @@ import { fetchContentfulPosts } from "../services/contentfulPosts";
 import { PostCard } from "../components/PostCard";
 import { IPost, IResponseItem } from "../types/types";
 
-const Home: NextPage = ({ posts }: any) => {
-  console.log(posts);
+interface HomePageProps {
+  content: Array<IPost>;
+}
+
+const Home = ({ content }: HomePageProps) => {
+  console.log(content);
   return (
     <div className="">
       <div className="">
@@ -15,7 +19,7 @@ const Home: NextPage = ({ posts }: any) => {
           <div className="m-auto w-1/2">
             <h2>New Stories</h2>
             <div className="grid grid-cols-3 gap-4">
-              {posts.map((post: IPost) => {
+              {content.map((post: IPost) => {
                 return (
                   <PostCard
                     key={post.slug}
@@ -35,14 +39,15 @@ const Home: NextPage = ({ posts }: any) => {
 export default Home;
 
 export async function getStaticProps() {
-  const res = await fetchContentfulPosts();
-  const posts = await res.map((post: IResponseItem) => {
+  const res = await fetchContentfulPosts<Array<IResponseItem>>();
+
+  const content = res.map((post: IResponseItem) => {
     return post.fields;
   });
 
   return {
     props: {
-      posts,
+      content,
     },
     revalidate: 60,
   };
