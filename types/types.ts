@@ -76,3 +76,11 @@ export interface IFullCategoryData {
   };
   fields: { category: string; slug: string };
 }
+
+export interface ICategoryProps {
+  targetCategory: string;
+}
+
+export interface CategoryParams extends ParsedUrlQuery {
+  slug: string;
+}

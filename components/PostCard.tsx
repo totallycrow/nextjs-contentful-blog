@@ -2,7 +2,16 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export const PostCard = ({ image, title, description, slug }: any) => {
+interface PostCardProps {
+  image: string;
+  slug: string;
+}
+
+export const PostCard = ({
+  image,
+
+  slug,
+}: PostCardProps) => {
   return (
     <div className="flex-column content-center m-auto text-center">
       <div className="h-40 w-40 relative ">

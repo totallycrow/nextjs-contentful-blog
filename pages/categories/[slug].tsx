@@ -1,12 +1,16 @@
+import { GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import {
   fetchContentfulCategories,
   fetchContentfulCategoryBySlug,
-  fetchContentfulPosts,
 } from "../../services/contentfulPosts";
-import { IFullCategoryData, IPost, IResponseItem } from "../../types/types";
+import {
+  CategoryParams,
+  ICategoryProps,
+  IFullCategoryData,
+} from "../../types/types";
 
-const Category = (props: any) => {
+const Category: React.FC<ICategoryProps> = (props) => {
   console.log(props);
   const router = useRouter();
   const { slug } = router.query;
@@ -16,7 +20,12 @@ const Category = (props: any) => {
 
 export default Category;
 
-export async function getStaticProps({ params }: any) {
+export const getStaticProps: GetStaticProps<
+  ICategoryProps,
+  CategoryParams
+> = async (context) => {
+  const params = context.params!;
+
   const category = await fetchContentfulCategoryBySlug<IFullCategoryData>(
     params.slug
   );
@@ -38,7 +47,7 @@ export async function getStaticProps({ params }: any) {
     },
     revalidate: 60,
   };
-}
+};
 
 export async function getStaticPaths() {
   console.log("STATIC PATHS - CATEGORIES");

@@ -1,9 +1,13 @@
 import Link from "next/link";
 import React from "react";
 import { fetchContentfulCategories } from "../../services/contentfulPosts";
-import { ICategoryResponse } from "../../types/types";
+import { ICategoryProps, ICategoryResponse } from "../../types/types";
 
-export const index = ({ categories }: any) => {
+interface ICategories {
+  categories: Array<ICategoryResponse>;
+}
+
+export const index = ({ categories }: ICategories) => {
   console.log(categories);
 
   return (
